@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de inventario</title>
+</head>
+<body>
+    <h1>Proyecto control de inventario</h1>
+    {% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1 class="mb-4">
+        Sistema de Control de Inventario
+    </h1>
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h5>Productos</h5>
+
+                    <h2>245</h2>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h5>Entradas</h5>
+
+                    <h2>18</h2>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h5>Salidas</h5>
+
+                    <h2>9</h2>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h5>Préstamos</h5>
+
+                    <h2>12</h2>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+</body>
+</html>
