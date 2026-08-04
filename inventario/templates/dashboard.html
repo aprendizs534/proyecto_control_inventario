@@ -1,80 +1,314 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de inventario</title>
-</head>
-<body>
-    <h1>Proyecto control de inventario</h1>
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}
-Dashboard
-{% endblock %}
+<!--Carga los archivos estáticos al inicio -->
+{% load static %}
+
+{% block title %}Dashboard - Sistema de Inventarios{% endblock %}
 
 {% block content %}
+<style>
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
 
-<div class="container mt-5">
+    /* Encabezado */
+    .header-top {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .logo-container img {
+        max-height: 50px;
+        width: auto;
+    }
+    .titulo-sistema {
+        color: #12164d;
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin: 0;
+        text-align: center;
+    }
+    .avatar-usuario {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-login-header {
+        background-color: #2e3376;
+        color: rgb(255, 255, 255);
+        padding: 8px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    .btn-login-header:hover { background-color: #1e2258; color: white; }
 
-    <h1 class="mb-4">
-        Sistema de Control de Inventario
-    </h1>
+    /* Barra de búsqueda */
+    .nav-bar-custom {
+        background-color: #2e3376;
+        border-radius: 50px;
+        padding: 8px 15px;
+        width: 100%; /* 2. Forzamos ancho completo para que baje de línea */
+        margin-bottom: 30px;
+    }
 
-    <div class="row">
+    /* Botones */
+    .boton-menu {
+        background-color: #2e3376;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        height: 140px;
+        width: 100%;
+        font-size: 1.2rem;
+        font-weight: 500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-decoration: none;
+        padding: 15px;
+    }
+    .boton-menu:hover {
+        background-color: #1e2258;
+        transform: translateY(-4px);
+        color: white;
+    }
+    @media (max-width: 768px) {
+        .titulo-sistema { font-size: 1.1rem; }
+        .boton-menu { height: 100px; font-size: 1rem; }
+    }
 
-        <div class="col-md-3">
-            <div class="card shadow">
-                <div class="card-body">
+        /* --- ESTILOS MENÚ ADMIN Y MODALES --- */
+    .admin-menu-btn {
+        background-color: #2e3376;
+        color: rgb(255, 255, 255);
+        border-radius: 50px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
+    }
+    .admin-menu-btn:hover {
+        background-color: #252575;
+        color: white;
+    }
 
-                    <h5>Productos</h5>
+    .admin-dropdown-menu {
+        background-color: #f0f0f3 !important;
+        border: none !important;
+        border-radius: 20px;
+        padding: 15px;
+        min-width: 220px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .admin-dropdown-menu .dropdown-item:hover {
+        background-color: transparent;
+        transform: scale(1.02);
+    }
+    .admin-dropdown-menu .dropdown-item:last-child {
+        margin-bottom: 0;
+    }
+    .admin-dropdown-menu .dropdown-item.text-danger {
+        color: #030303 !important;
+    }
+</style>
 
-                    <h2>245</h2>
-
-                </div>
-            </div>
+<div class="main-container">
+    
+    <!-- ENCABEZADO -->
+    <div class="header-top">
+        <!-- Logo -->
+        <div class="logo-container">
+            <!-- 3. Cambia 'logo_ingemol.png' por el nombre real de tu imagen -->
+            <img src="{% static 'LOGO1.png' %}" alt="Logo INGEMOL">
         </div>
 
-        <div class="col-md-3">
-            <div class="card shadow">
-                <div class="card-body">
+        <!-- Título -->
+        <h1 class="titulo-sistema">SISTEMA Y CONTROL DE INVENTARIOS</h1>
 
-                    <h5>Entradas</h5>
-
-                    <h2>18</h2>
-
-                </div>
+        <!-- Zona de Usuario -->
+                <!-- Zona de Usuario -->
+        <div class="avatar-usuario">
+            <div class="dropdown">
+                <button class="btn admin-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="text-white fw-bold fs-6">admin</span>
+                    <i class="bi bi-person-circle text-white" style="font-size: 1.5rem;"></i>
+                </button>
+                
+                <ul class="dropdown-menu admin-dropdown-menu">
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">Perfil</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar usuario</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalEliminar">Eliminar usuario</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalContrasena">Cambiar contraseña</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalConfig">Configuración</a></li>
+                    <li><a class="dropdown-item text-danger fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#modalCerrarSesion">Cerrar sesión</a></li>
+                </ul>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-3">
-            <div class="card shadow">
-                <div class="card-body">
 
-                    <h5>Salidas</h5>
+    <!-- BARRA DE BÚSQUEDA (Ahora ocupa todo el ancho gracias al `w-100` del CSS) -->
+    <div class="d-flex align-items-center nav-bar-custom">
+        <button class="btn text-white p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
+            <i class="bi bi-list" style="font-size: 1.8rem;"></i>
+        </button>
+        
+        <div class="input-group flex-grow-1" style="background-color: transparent;">
+            <input type="text" class="form-control text-white text-end bg-transparent border-0" placeholder="BUSCAR" style="caret-color: white;">
+            <span class="input-group-text bg-transparent border-0 text-white">
+                <i class="bi bi-search fs-5"></i>
+            </span>
+        </div>
+    </div>
 
-                    <h2>9</h2>
-
-                </div>
+    <!-- MENÚ LATERAL -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold" id="menuLateralLabel">Opciones</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
+                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-3">
-            <div class="card shadow">
-                <div class="card-body">
-
-                    <h5>Préstamos</h5>
-
-                    <h2>12</h2>
-
-                </div>
-            </div>
-        </div>
-
+    <!-- GRID DE BOTONES -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col"><a href="#" class="boton-menu">HERRAMIENTAS</a></div>
+        <div class="col"><a href="#" class="boton-menu">MAQUINAS</a></div>
+        <div class="col"><a href="#" class="boton-menu">EQUIPOS</a></div>
+        <div class="col"><a href="#" class="boton-menu">MATERIALES</a></div>
+        <div class="col"><a href="#" class="boton-menu">PINTURAS</a></div>
+        <div class="col"><a href="#" class="boton-menu">INSUMOS</a></div>
+        <div class="col"><a href="#" class="boton-menu">EPPS</a></div>
+        <div class="col"><a href="#" class="boton-menu">DOTACIONES</a></div>
+        <div class="col"><a href="#" class="boton-menu">ASEO Y<br>CAFETERIA</a></div>
     </div>
 
 </div>
+<!-- --- MODALES DE ADMINISTRACIÓN --- -->
 
+<!-- 1. MODAL PERFIL -->
+<div class="modal fade" id="modalPerfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title fw-bold">Perfil de Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <p><strong>Nombre:</strong> Pepito Perez</p>
+            <p><strong>Usuario:</strong> admin</p>
+            <p><strong>Dependencia:</strong> producción</p>
+            <p><strong>Permisos:</strong> administrador</p>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+    </div></div>
+</div>
+
+<!-- 2. MODAL AGREGAR USUARIO -->
+<div class="modal fade" id="modalAgregar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title fw-bold">Agregar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="mb-3"><label class="form-label fw-bold">Nombre:</label><input type="text" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control"></div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Permisos:</label>
+                <select class="form-select">
+                    <option selected>Selecciona un rol</option>
+                    <option value="admin">Administrador</option>
+                    <option value="operador">Operador</option>
+                    <option value="lectura">Solo Lectura</option>
+                </select>
+            </div>
+            <div class="mb-3"><label class="form-label fw-bold">Contraseña:</label><input type="password" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Confirmar contraseña:</label><input type="password" class="form-control"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Agregar usuario</button></div>
+    </div></div>
+</div>
+
+<!-- 3. MODAL ELIMINAR USUARIO -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title fw-bold">Eliminar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text fw-bold">Nombre:</span>
+                <input type="text" class="form-control" placeholder="Buscar usuario...">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+            </div>
+            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control" placeholder="(Se autocompletará)"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control" placeholder="(Se autocompletará)"></div>
+            <p class="text-danger small mt-2 fw-bold">* Al hacer clic en eliminar, se borrará permanentemente.</p>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Eliminar Usuario</button></div>
+    </div></div>
+</div>
+
+<!-- 4. MODAL CAMBIAR CONTRASEÑA -->
+<div class="modal fade" id="modalContrasena" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title fw-bold">Cambiar Contraseña</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text fw-bold">Nombre:</span>
+                <input type="text" class="form-control" value="Pepito Perez" readonly>
+            </div>
+            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control" value="admin" readonly></div>
+            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control" value="producción" readonly></div>
+            <div class="mb-3"><label class="form-label fw-bold">Nueva contraseña:</label><input type="password" class="form-control"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Cambiar contraseña</button></div>
+    </div></div>
+</div>
+
+<!-- 5. MODAL CONFIGURACIÓN -->
+<div class="modal fade" id="modalConfig" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title fw-bold">Configuración</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text fw-bold">Nombre:</span>
+                <input type="text" class="form-control">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+            </div>
+            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Guardar cambios</button></div>
+    </div></div>
+</div>
+
+<!-- 6. MODAL CERRAR SESIÓN -->
+<div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+        <div class="modal-body text-center p-4">
+            <h4 class="fw-bold mb-4">¿Desea cerrar sesión?</h4>
+            <div class="d-flex justify-content-center gap-3">
+                <button type="button" class="btn text-white fw-bold px-4 py-2" style="background-color: #2e3376; border-radius: 50px;">SI</button>
+                <button type="button" class="btn text-white fw-bold px-4 py-2" style="background-color: #2e3376; border-radius: 50px;" data-bs-dismiss="modal">NO</button>
+            </div>
+        </div>
+    </div></div>
+</div>
 {% endblock %}
-</body>
-</html>
