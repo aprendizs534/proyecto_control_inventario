@@ -1,3 +1,133 @@
-body{
-    background:#3c5299f1;
-}
+
+.main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    /* Encabezado */
+    .header-top {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .logo-container img {
+        max-height: 50px;
+        width: auto;
+    }
+    .titulo-sistema {
+        color: #12164d;
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin: 0;
+        text-align: center;
+    }
+    .avatar-usuario {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-login-header {
+        background-color: #2e3376;
+        color: rgb(255, 255, 255);
+        padding: 8px 20px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    .btn-login-header:hover { background-color: #1e2258; color: white; }
+
+    /* Barra de búsqueda */
+    .nav-bar-custom {
+        background-color: #2e3376;
+        border-radius: 50px;
+        padding: 8px 15px;
+        width: 100%; /* 2. Forzamos ancho completo para que baje de línea */
+        margin-bottom: 30px;
+    }
+        /* --- BOTÓN DE ASIGNACIONES --- */
+    .btn-asignaciones {
+        border: 2.5px solid #2e3376;
+        color: #2e3376;
+        border-radius: 50px;
+        font-weight: 900;
+        padding: 20px 120px;
+        background-color: transparent;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .btn-asignaciones:hover {
+        background-color: #2e3376;
+        color: white;
+    }
+
+    /* Botones */
+    .boton-menu {
+        background-color: #2e3376;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        height: 140px;
+        width: 100%;
+        font-size: 1.2rem;
+        font-weight: 500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-decoration: none;
+        padding: 15px;
+    }
+    .boton-menu:hover {
+        background-color: #1e2258;
+        transform: translateY(-4px);
+        color: white;
+    }
+    @media (max-width: 768px) {
+        .titulo-sistema { font-size: 1.1rem; }
+        .boton-menu { height: 100px; font-size: 1rem; }
+    }
+
+        /* --- ESTILOS MENÚ ADMIN Y MODALES --- */
+    .admin-menu-btn {
+        background-color: #2e3376!important;
+        color: rgb(255, 255, 255) !important;
+        border-radius: 50px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
+    }
+    .admin-menu-btn:hover {
+        background-color: #252575;
+        color: white;
+    }
+
+    .admin-dropdown-menu {
+        background-color: #ebeae5 !important;
+        border: none !important;
+        border-radius: 20px;
+        padding: 15px;
+        min-width: 220px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .admin-dropdown-menu .dropdown-item:hover {
+        background-color: transparent;
+        transform: scale(1.02);
+    }
+    .admin-dropdown-menu .dropdown-item:last-child {
+        margin-bottom: 0;
+    }
+    .admin-dropdown-menu .dropdown-item.text-danger {
+        color: #030303 !important;
+    }

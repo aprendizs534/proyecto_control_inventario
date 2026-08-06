@@ -1,0 +1,22 @@
+{% extends 'inventario/base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="main-container mt-4">
+    <!-- Botón para volver al Dashboard -->
+    <div class="mb-4">
+        <a href="{% url 'inventario:dashboard' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4">
+            &larr; volver
+        </a>
+    </div>
+
+    <!-- Título de la página -->
+    <h2 class="text-center fw-bold mb-4" style="color: #2e3376;">{{ titulo }}</h2>
+
+    <div class="text-center text-muted py-5">
+        <p>Esta es la página de <strong>{{ titulo }}</strong>.</p>
+        <p>Aquí irá el formulario y la tabla correspondiente.</p>
+    </div>
+</div>
+{% endblock %}

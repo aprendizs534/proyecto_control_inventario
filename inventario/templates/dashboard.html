@@ -6,125 +6,6 @@
 {% block title %}Dashboard - Sistema de Inventarios{% endblock %}
 
 {% block content %}
-<style>
-    .main-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        padding: 25px;
-        border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    /* Encabezado */
-    .header-top {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    .logo-container img {
-        max-height: 50px;
-        width: auto;
-    }
-    .titulo-sistema {
-        color: #12164d;
-        font-weight: 700;
-        font-size: 1.6rem;
-        margin: 0;
-        text-align: center;
-    }
-    .avatar-usuario {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .btn-login-header {
-        background-color: #2e3376;
-        color: rgb(255, 255, 255);
-        padding: 8px 20px;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-    .btn-login-header:hover { background-color: #1e2258; color: white; }
-
-    /* Barra de búsqueda */
-    .nav-bar-custom {
-        background-color: #2e3376;
-        border-radius: 50px;
-        padding: 8px 15px;
-        width: 100%; /* 2. Forzamos ancho completo para que baje de línea */
-        margin-bottom: 30px;
-    }
-
-    /* Botones */
-    .boton-menu {
-        background-color: #2e3376;
-        color: white;
-        border: none;
-        border-radius: 20px;
-        height: 140px;
-        width: 100%;
-        font-size: 1.2rem;
-        font-weight: 500;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        text-decoration: none;
-        padding: 15px;
-    }
-    .boton-menu:hover {
-        background-color: #1e2258;
-        transform: translateY(-4px);
-        color: white;
-    }
-    @media (max-width: 768px) {
-        .titulo-sistema { font-size: 1.1rem; }
-        .boton-menu { height: 100px; font-size: 1rem; }
-    }
-
-        /* --- ESTILOS MENÚ ADMIN Y MODALES --- */
-    .admin-menu-btn {
-        background-color: #2e3376;
-        color: rgb(255, 255, 255);
-        border-radius: 50px;
-        padding: 8px 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: 0.3s;
-    }
-    .admin-menu-btn:hover {
-        background-color: #252575;
-        color: white;
-    }
-
-    .admin-dropdown-menu {
-        background-color: #f0f0f3 !important;
-        border: none !important;
-        border-radius: 20px;
-        padding: 15px;
-        min-width: 220px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    
-    .admin-dropdown-menu .dropdown-item:hover {
-        background-color: transparent;
-        transform: scale(1.02);
-    }
-    .admin-dropdown-menu .dropdown-item:last-child {
-        margin-bottom: 0;
-    }
-    .admin-dropdown-menu .dropdown-item.text-danger {
-        color: #030303 !important;
-    }
-</style>
 
 <div class="main-container">
     
@@ -132,7 +13,7 @@
     <div class="header-top">
         <!-- Logo -->
         <div class="logo-container">
-            <!-- 3. Cambia 'logo_ingemol.png' por el nombre real de tu imagen -->
+            
             <img src="{% static 'LOGO1.png' %}" alt="Logo INGEMOL">
         </div>
 
@@ -161,19 +42,25 @@
     </div>
 
 
-    <!-- BARRA DE BÚSQUEDA (Ahora ocupa todo el ancho gracias al `w-100` del CSS) -->
+    <!-- BARRA DE BÚSQUEDA -->
     <div class="d-flex align-items-center nav-bar-custom">
         <button class="btn text-white p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
             <i class="bi bi-list" style="font-size: 1.8rem;"></i>
         </button>
         
         <div class="input-group flex-grow-1" style="background-color: transparent;">
-            <input type="text" class="form-control text-white text-end bg-transparent border-0" placeholder="BUSCAR" style="caret-color: white;">
+            <input type="text" class="form-control text-white text-end bg-transparent border-0" placeholder="BUSCAR" autocomplete="off" style="caret-color: white;">
             <span class="input-group-text bg-transparent border-0 text-white">
                 <i class="bi bi-search fs-5"></i>
             </span>
         </div>
     </div>
+    
+    <!-- Botón de Asignaciones -->
+    <div class="d-flex justify-content-center mb-4">
+        <a href="{% url 'inventario:asignaciones' %}" class="btn-asignaciones">ASIGNACIONES</a>
+    </div>
+
 
     <!-- MENÚ LATERAL -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
@@ -184,8 +71,8 @@
         <div class="offcanvas-body p-0">
             <div class="list-group list-group-flush">
                 <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
+                <a href="{% url 'inventario:menu_entradas' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
+                <a href="{% url 'inventario:menu_salidas' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
                 <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
                 <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
                 <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
@@ -195,15 +82,15 @@
 
     <!-- GRID DE BOTONES -->
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col"><a href="#" class="boton-menu">HERRAMIENTAS</a></div>
-        <div class="col"><a href="#" class="boton-menu">MAQUINAS</a></div>
-        <div class="col"><a href="#" class="boton-menu">EQUIPOS</a></div>
-        <div class="col"><a href="#" class="boton-menu">MATERIALES</a></div>
-        <div class="col"><a href="#" class="boton-menu">PINTURAS</a></div>
-        <div class="col"><a href="#" class="boton-menu">INSUMOS</a></div>
-        <div class="col"><a href="#" class="boton-menu">EPPS</a></div>
-        <div class="col"><a href="#" class="boton-menu">DOTACIONES</a></div>
-        <div class="col"><a href="#" class="boton-menu">ASEO Y<br>CAFETERIA</a></div>
+        <div class="col"><a href="{% url 'inventario:herramientas' %}" class="boton-menu">HERRAMIENTAS</a></div>
+        <div class="col"><a href="{% url 'inventario:maquinas' %}" class="boton-menu">MAQUINAS</a></div>
+        <div class="col"><a href="{% url 'inventario:equipos' %}" class="boton-menu">EQUIPOS</a></div>
+        <div class="col"><a href="{% url 'inventario:materiales'%}" class="boton-menu">MATERIALES</a></div>
+        <div class="col"><a href="{% url 'inventario:pinturas' %}" class="boton-menu">PINTURAS</a></div>
+        <div class="col"><a href="{% url 'inventario:insumos' %}" class="boton-menu">INSUMOS</a></div>
+        <div class="col"><a href="{% url 'inventario:epps' %}" class="boton-menu">EPPS</a></div>
+        <div class="col"><a href="{% url 'inventario:dotaciones'%}" class="boton-menu">DOTACIONES</a></div>
+        <div class="col"><a href="{% url 'inventario:aseo_cafeteria'%}" class="boton-menu">ASEO Y<br>CAFETERIA</a></div>
     </div>
 
 </div>
