@@ -70,12 +70,12 @@
         </div>
         <div class="offcanvas-body p-0">
             <div class="list-group list-group-flush">
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
+                <a href="{% url 'inventario:asignaciones' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
                 <a href="{% url 'inventario:menu_entradas' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
                 <a href="{% url 'inventario:menu_salidas' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
+                <a href="{% url 'inventario:ubicaciones' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
+                <a href="{% url 'inventario:estado_productos' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
+                <a href="{% url 'inventario:categorias' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
             </div>
         </div>
     </div>
