@@ -11,6 +11,8 @@ class TipoProducto(models.TextChoices):
     EQUIPO = 'EQUIPO', 'Equipo'
     CONSUMIBLE = 'CONSUMIBLE', 'Consumible'
     HERRAMIENTA = 'HERRAMIENTA', 'Herramienta'
+    MATERIALES = 'MATERIALES', 'Materiales'
+    NA = 'N/A', 'N/A'
 
 class TipoMovimiento(models.TextChoices):
     ENTRADA = 'ENTRADA', 'Entrada'
@@ -102,7 +104,7 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name='productos')
     marca = models.ForeignKey(Marca, on_delete=models.PROTECT, related_name='productos')
     serial_ingemol = models.CharField(max_length=50, blank=True, null=True)
-    tipo_producto = models.CharField(max_length=20, choices=TipoProducto.choices, default=TipoProducto.EQUIPO)
+    tipo_producto = models.CharField(max_length=20, choices=TipoProducto.choices, default=TipoProducto.NA, blank= True)
     
     # Responsable general (quien tiene la custodia)
     responsable = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='productos_responsable')

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Sede, Categoria, Marca, EstadoProducto, Ubicacion, RolUsuario, 
     Usuario, Producto, Movimiento, Prestamo, PrestamoConsumible,
-    InventarioSede
+    InventarioSede,
 )
 
 @admin.register(Sede)
@@ -16,6 +16,7 @@ class InventarioSedeAdmin(admin.ModelAdmin):
     list_filter = ('sede', 'estado')
     search_fields = ('producto__descripcion', 'sede__descripcion')
     list_select_related = ('producto', 'sede')
+
 
 admin.site.register(Categoria)
 admin.site.register(Marca)

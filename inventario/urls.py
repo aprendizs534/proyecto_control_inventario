@@ -25,4 +25,6 @@ urlpatterns = [
     path('menu/ubicaciones/', views.ubicaciones, name='ubicaciones'),
     path('menu/estado-productos/', views.estado_productos, name='estado_productos'),
     path('menu/categorias/', views.categorias, name='categorias'),
+
+    path('entradas/registrar/', views.registrar_entrada, name='registrar_entrada'),
 ]
