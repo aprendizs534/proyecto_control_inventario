@@ -75,7 +75,7 @@ def registrar_entrada(request):
             observaciones=observaciones
         )
 
-        messages.success(request, f"Entrada registrada exitosamente para {producto.descripcion} en {sede.descripcion}.")
+        messages.success(request,f"Entrada registrada exitosamente para {producto.descripcion} en {sede.descripcion}.")
         return redirect('inventario:registrar_entrada')
 
     context = {
