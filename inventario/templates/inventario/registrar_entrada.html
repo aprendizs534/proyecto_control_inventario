@@ -3,96 +3,140 @@
 {% block title %}Registrar Entrada - Sistema de Inventarios{% endblock %}
 
 {% block content %}
-<style>
-    .main-container { max-width: 800px; margin: 0 auto; background-color: #c7c0c0; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-</style>
 
 <div class="main-container mt-4">
-    
+
+   <!-- Cabecera Limpia -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{% url 'inventario:dashboard' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4">&larr; volver</a>
-        <h3 class="fw-bold text-center m-0" style="color: #2e3376;">Registrar Entrada</h3>
-        <div style="width: 100px;"></div> <!-- Espaciador para centrar el título -->
+        <a href="{% url 'inventario:dashboard' %}"
+           class="btn btn-outline-dark fw-bold rounded-pill px-4">
+            &larr; Volver
+        </a>
+        <h3 class="fw-bold m-0" style="color: #2e3376;">Registrar Entrada</h3>
+
+        <!--El flex con justify-content-between ya centra el título visualmente--> 
+
+        <div class="invisible">
+            <span class="btn px-4">placeholder</span>
+        </div>
     </div>
 
-    <form method="POST">
-        {% csrf_token %}
-
-        <div class="row g-3">
-            <!-- Producto -->
-            <div class="col-md-6">
-                <label for="producto" class="form-label fw-bold">Producto:</label>
-                <select name="producto" id="producto" class="form-select" required>
-                    <option value="" selected disabled>Selecciona un producto</option>
-                    {% for p in productos %}
-                        <option value="{{ p.id }}">{{ p.codigo }} - {{ p.descripcion }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Sede -->
-            <div class="col-md-6">
-                <label for="sede" class="form-label fw-bold">Sede de destino:</label>
-                <select name="sede" id="sede" class="form-select" required>
-                    <option value="" selected disabled>Selecciona una sede</option>
-                    {% for s in sedes %}
-                        <option value="{{ s.id }}">{{ s.descripcion }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Cantidad -->
-            <div class="col-md-6">
-                <label for="cantidad" class="form-label fw-bold">Cantidad a registrar:</label>
-                <input type="number" name="cantidad" id="cantidad" class="form-control" min="1" required>
-            </div>
-
-            <!-- Estado -->
-            <div class="col-md-6">
-                <label for="estado" class="form-label fw-bold">Estado del producto:</label>
-                <select name="estado" id="estado" class="form-select" required>
-                    <option value="" selected disabled>Selecciona un estado</option>
-                    {% for e in estados %}
-                        <option value="{{ e.id }}">{{ e.descripcion }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Ubicación -->
-            <div class="col-md-12">
-                <label for="ubicacion" class="form-label fw-bold">Ubicación dentro de la sede (Opcional):</label>
-                <select name="ubicacion" id="ubicacion" class="form-select">
-                    <option value="">Sin ubicación específica</option>
-                    {% for u in ubicaciones %}
-                        <option value="{{ u.id }}">{{ u.descripcion }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Observaciones -->
-            <div class="col-12">
-                <label for="observaciones" class="form-label fw-bold">Observaciones (Opcional):</label>
-                <textarea name="observaciones" id="observaciones" class="form-control" rows="2"></textarea>
-            </div>
-        </div>
-
-        <div class="mt-4 text-end">
-            <button type="submit" class="btn fw-bold px-4 py-2" style="background-color: #2e3376; color: white; border-radius: 50px;">
-                <i class="bi bi-plus-circle me-2"></i> Registrar Entrada
-            </button>
-        </div>
-    </form>
-
+   <!-- Zona de Mensajes de Django (Alertas de éxito/error) -->
     {% if messages %}
-        <div class="mt-3">
+        <div class="mb-3">
             {% for message in messages %}
-                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+                <div class="alert
+                    {% if message.tags == 'error' %}alert-danger
+                    {% else %}alert-success{% endif %}
+                    alert-dismissible fade show"
+                    role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
+    <!-- Formulario-->
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+            <!-- Producto -->
+            <div class="col-md-6">
+                <label for="{{ form.producto.id_for_label }}" class="form-label fw-bold">
+                    Producto:
+                </label>
+                {{ form.producto }}
+                {% if form.producto.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.producto.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sede de destino -->
+            <div class="col-md-6">
+                <label for="{{ form.sede.id_for_label }}" class="form-label fw-bold">
+                    Sede de destino:
+                </label>
+                {{ form.sede }}
+                {% if form.sede.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.sede.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!--Cantidad-->
+            <div class="col-md-6">
+                <label for="{{ form.cantidad.id_for_label }}" class="form-label fw-bold">
+                    Cantidad a registrar:
+                </label>
+                {{ form.cantidad }}
+                {% if form.cantidad.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.cantidad.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Estado -->
+            <div class="col-md-6">
+                <label for="{{ form.estado.id_for_label }}" class="form-label fw-bold">
+                    Estado del producto:
+                </label>
+                {{ form.estado }}
+                {% if form.estado.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.estado.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!--Ubicación-->
+            <div class="col-md-12">
+                <label for="{{ form.ubicacion.id_for_label }}" class="form-label fw-bold">
+                    Ubicación dentro de la sede
+                    <span class="text-muted fw-normal">(Opcional)</span>:
+                </label>
+                {{ form.ubicacion }}
+                {% if form.ubicacion.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.ubicacion.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Observaciones -->
+            <div class="col-12">
+                <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-bold">
+                    Observaciones
+                    <span class="text-muted fw-normal">(Opcional)</span>:
+                </label>
+                {{ form.observaciones }}
+                {% if form.observaciones.errors %}
+                    <div class="text-danger small mt-1">
+                        {{ form.observaciones.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Boton de envío --> 
+        <div class="mt-4 text-end">
+            <button type="submit"
+                    class="btn btn-primary fw-bold px-4 py-2 rounded-pill">
+                <i class="bi bi-plus-circle me-2"></i> Registrar Entrada
+            </button>
+        </div>
+
+    </form>
+
 </div>
+
 {% endblock %}
