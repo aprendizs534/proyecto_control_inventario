@@ -6,32 +6,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Sistema de Gestión de Inventarios{% endblock %}">
 
     <title>{% block title %}Sistema de Inventario{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <!-- CSS propio -->
+    <!-- CSS propio (aquí van tus variables y estilos globales) -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-
+    <!-- Bloque para CSS adicional por página (datepickers, select2, etc.) -->
+    {% block extra_css %}{% endblock %}
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
-    {% block content %}
+    {% block content %}{% endblock %}
 
-    {% endblock %}
-
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- JS propio -->
     <script src="{% static 'js/script.js' %}"></script>
 
-</body>
+    <!-- Bloque para scripts adicionales por página -->
+    {% block extra_js %}{% endblock %}
 
+</body>
 </html>

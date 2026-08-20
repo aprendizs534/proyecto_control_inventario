@@ -1,22 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ titulo }}{% endblock %}
+{% block title %}{{ titulo }} - Sistema de Inventarios{% endblock %}
 
 {% block content %}
 <div class="main-container mt-4">
-    <!-- Botón para volver al Dashboard -->
-    <div class="mb-4">
-        <a href="{% url 'inventario:dashboard' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4">
-            &larr; volver
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'inventario:dashboard' %}"
+           class="btn btn-outline-dark fw-bold rounded-pill px-4">
+            &larr; Volver
         </a>
+        <h2 class="fw-bold m-0 color-primario">{{ titulo }}</h2>
+        {# Spacer invisible para mantener el título centrado con flexbox #}
+        <div class="invisible">
+            <span class="btn px-4">placeholder</span>
+        </div>
     </div>
 
-    <!-- Título de la página -->
-    <h2 class="text-center fw-bold mb-4" style="color: #2e3376;">{{ titulo }}</h2>
-
+    {% block subpage_content %}
     <div class="text-center text-muted py-5">
-        <p>Esta es la página de <strong>{{ titulo }}</strong>.</p>
-        <p>Aquí irá el formulario y la tabla correspondiente.</p>
+        <i class="bi bi-tools fs-1 mb-3 d-block"></i>
+        <p>Esta sección está en construcción.</p>
+        <p>Aquí irá el formulario y la tabla de <strong>{{ titulo }}</strong>.</p>
     </div>
+    {% endblock %}
+
 </div>
 {% endblock %}

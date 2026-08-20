@@ -160,21 +160,9 @@ class InventarioSede(models.Model):
             f"{self.producto.descripcion} - {self.sede.descripcion} "
             f"(Disp: {self.cantidad_disponible})"
         )
-
-    # lógica de negocio en el modelo 
-"""Incrementa las existencias totales y disponibles.
-
-        Delega la operación matemática a la base de datos utilizando expresiones F()
-        para mitigar de manera absoluta condiciones de carrera concurrentes.
-
-        Args:
-            cantidad (int): Volumen físico de artículos que ingresan.
-            estado (EstadoProducto): Instancia del estado físico actual del lote.
-            ubicacion (Ubicacion, opcional): Posición en estante asignada. Defaults to None.
-        """
-
-@transaction.atomic
-def aplicar_entrada(self, cantidad: int, estado, ubicacion=None):
+    
+    @transaction.atomic
+    def aplicar_entrada(self, cantidad: int, estado, ubicacion=None):
         self.estado = estado
         if ubicacion:
             self.ubicacion = ubicacion
@@ -186,6 +174,18 @@ def aplicar_entrada(self, cantidad: int, estado, ubicacion=None):
         )
         # Sincronizamos el estado y la ubicación por separado
         self.save(update_fields=['estado', 'ubicacion'])
+
+
+"""Incrementa las existencias totales y disponibles.
+
+        Delega la operación matemática a la base de datos utilizando expresiones F()
+        para mitigar de manera absoluta condiciones de carrera concurrentes.
+
+        Args:
+            cantidad (int): Volumen físico de artículos que ingresan.
+            estado (EstadoProducto): Instancia del estado físico actual del lote.
+            ubicacion (Ubicacion, opcional): Posición en estante asignada. Defaults to None.
+        """
 
 
 #  Movimiento 

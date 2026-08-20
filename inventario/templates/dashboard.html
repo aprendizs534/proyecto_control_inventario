@@ -1,199 +1,276 @@
 {% extends 'base.html' %}
-
-<!--Carga los archivos estáticos al inicio -->
 {% load static %}
 
 {% block title %}Dashboard - Sistema de Inventarios{% endblock %}
 
 {% block content %}
-
 <div class="main-container">
-    
-    <!-- ENCABEZADO -->
+
+    {# ── ENCABEZADO ── #}
     <div class="header-top">
-        <!-- Logo -->
         <div class="logo-container">
-            
             <img src="{% static 'LOGO1.png' %}" alt="Logo INGEMOL">
         </div>
 
-        <!-- Título -->
         <h1 class="titulo-sistema">SISTEMA Y CONTROL DE INVENTARIOS</h1>
 
-        <!-- Zona de Usuario -->
-                <!-- Zona de Usuario -->
         <div class="avatar-usuario">
             <div class="dropdown">
-                <button class="btn admin-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="text-white fw-bold fs-6">admin</span>
+                <button class="btn admin-menu-btn" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+
+                    {# CORREGIDO: usuario dinámico desde la sesión #}
+                    <span class="text-white fw-bold fs-6">
+                        {{ request.user.username }}
+                    </span>
                     <i class="bi bi-person-circle text-white" style="font-size: 1.5rem;"></i>
                 </button>
-                
+
                 <ul class="dropdown-menu admin-dropdown-menu">
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">Perfil</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalAgregar">Agregar usuario</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalEliminar">Eliminar usuario</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalContrasena">Cambiar contraseña</a></li>
-                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalConfig">Configuración</a></li>
-                    <li><a class="dropdown-item text-danger fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#modalCerrarSesion">Cerrar sesión</a></li>
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalPerfil">
+                            Perfil
+                        </a>
+                    </li>
+
+                    {# CORREGIDO: opciones de admin solo para administradores #}
+                    {% if request.user.perfil_inventario.tipo_usuario == 'ADMIN' %}
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalAgregar">
+                            Agregar usuario
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                            Eliminar usuario
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalContrasena">
+                            Cambiar contraseña
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalConfig">
+                            Configuración
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger fw-bold" href="#"
+                           data-bs-toggle="modal" data-bs-target="#modalCerrarSesion">
+                            Cerrar sesión
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
-
-    <!-- BARRA DE BÚSQUEDA -->
+    {# ── BARRA DE BÚSQUEDA ── #}
     <div class="d-flex align-items-center nav-bar-custom">
-        <button class="btn text-white p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
+        <button class="btn text-white p-0 me-3" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#menuLateral">
             <i class="bi bi-list" style="font-size: 1.8rem;"></i>
         </button>
-        
-        <div class="input-group flex-grow-1" style="background-color: transparent;">
-            <input type="text" class="form-control text-white text-end bg-transparent border-0" placeholder="BUSCAR" autocomplete="off" style="caret-color: white;">
+        <div class="input-group flex-grow-1">
+            <input type="text" class="form-control text-white text-end bg-transparent border-0"
+                   placeholder="BUSCAR" autocomplete="off" style="caret-color: white;">
             <span class="input-group-text bg-transparent border-0 text-white">
                 <i class="bi bi-search fs-5"></i>
             </span>
         </div>
     </div>
-    
-    <!-- Botón de Asignaciones -->
+
+    {# ── BOTÓN ASIGNACIONES ── #}
     <div class="d-flex justify-content-center mb-4">
         <a href="{% url 'inventario:asignaciones' %}" class="btn-asignaciones">ASIGNACIONES</a>
     </div>
 
-
-    <!-- MENÚ LATERAL -->
+    {# ── MENÚ LATERAL ── #}
     <div class="offcanvas offcanvas-start" tabindex="-1" id="menuLateral">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title fw-bold" id="menuLateralLabel">Opciones</h5>
+            <h5 class="offcanvas-title fw-bold">Opciones</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
         </div>
         <div class="offcanvas-body p-0">
             <div class="list-group list-group-flush">
-                <a href="{% url 'inventario:asignaciones' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
+                <a href="{% url 'inventario:asignaciones' %}"      class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
                 <a href="{% url 'inventario:registrar_entrada' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
-                <a href="{% url 'inventario:menu_salidas' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
-                <a href="{% url 'inventario:ubicaciones' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
-                <a href="{% url 'inventario:estado_productos' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
-                <a href="{% url 'inventario:categorias' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
+                <a href="{% url 'inventario:menu_salidas' %}"      class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
+                <a href="{% url 'inventario:ubicaciones' %}"       class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>
+                <a href="{% url 'inventario:estado_productos' %}"  class="list-group-item list-group-item-action py-3 fw-bold text-center">Estado productos</a>
+                <a href="{% url 'inventario:categorias' %}"        class="list-group-item list-group-item-action py-3 fw-bold text-center">Categorías</a>
             </div>
         </div>
     </div>
 
-    <!-- GRID DE BOTONES -->
+    {# ── GRID DE BOTONES ── #}
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col"><a href="{% url 'inventario:herramientas' %}" class="boton-menu">HERRAMIENTAS</a></div>
-        <div class="col"><a href="{% url 'inventario:maquinas' %}" class="boton-menu">MAQUINAS</a></div>
-        <div class="col"><a href="{% url 'inventario:equipos' %}" class="boton-menu">EQUIPOS</a></div>
-        <div class="col"><a href="{% url 'inventario:materiales'%}" class="boton-menu">MATERIALES</a></div>
-        <div class="col"><a href="{% url 'inventario:pinturas' %}" class="boton-menu">PINTURAS</a></div>
-        <div class="col"><a href="{% url 'inventario:insumos' %}" class="boton-menu">INSUMOS</a></div>
-        <div class="col"><a href="{% url 'inventario:epps' %}" class="boton-menu">EPPS</a></div>
-        <div class="col"><a href="{% url 'inventario:dotaciones'%}" class="boton-menu">DOTACIONES</a></div>
-        <div class="col"><a href="{% url 'inventario:aseo_cafeteria'%}" class="boton-menu">ASEO Y<br>CAFETERIA</a></div>
+        <div class="col"><a href="{% url 'inventario:herramientas' %}"   class="boton-menu">HERRAMIENTAS</a></div>
+        <div class="col"><a href="{% url 'inventario:maquinas' %}"       class="boton-menu">MAQUINAS</a></div>
+        <div class="col"><a href="{% url 'inventario:equipos' %}"        class="boton-menu">EQUIPOS</a></div>
+        <div class="col"><a href="{% url 'inventario:materiales' %}"     class="boton-menu">MATERIALES</a></div>
+        <div class="col"><a href="{% url 'inventario:pinturas' %}"       class="boton-menu">PINTURAS</a></div>
+        <div class="col"><a href="{% url 'inventario:insumos' %}"        class="boton-menu">INSUMOS</a></div>
+        <div class="col"><a href="{% url 'inventario:epps' %}"           class="boton-menu">EPPS</a></div>
+        <div class="col"><a href="{% url 'inventario:dotaciones' %}"     class="boton-menu">DOTACIONES</a></div>
+        <div class="col"><a href="{% url 'inventario:aseo_cafeteria' %}" class="boton-menu">ASEO Y<br>CAFETERIA</a></div>
     </div>
 
 </div>
-<!-- --- MODALES DE ADMINISTRACIÓN --- -->
 
-<!-- 1. MODAL PERFIL -->
+   <!--MODALES-->
+
+{# 1. MODAL PERFIL — datos dinámicos del usuario en sesión #}
 <div class="modal fade" id="modalPerfil" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title fw-bold">Perfil de Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-            <p><strong>Nombre:</strong>Alejandro Montoya</p>
-            <p><strong>Usuario:</strong> administrador</p>
-            <p><strong>Dependencia:</strong> producción</p>
-            <p><strong>Permisos:</strong> administrador</p>
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">Perfil de Usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+        <div class="modal-body">
+            {# CORREGIDO: datos reales desde la sesión #}
+            <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+            <p><strong>Nombre:</strong> {{ request.user.perfil_inventario.descripcion|default:"Sin nombre" }}</p>
+            <p><strong>Teléfono:</strong> {{ request.user.perfil_inventario.telefono|default:"No registrado" }}</p>
+            <p><strong>Rol:</strong> {{ request.user.perfil_inventario.rol.descripcion|default:"Sin rol" }}</p>
+            <p><strong>Tipo:</strong> {{ request.user.perfil_inventario.get_tipo_usuario_display }}</p>
+            <p><strong>Sede:</strong> {{ request.user.perfil_inventario.sede_por_defecto.descripcion|default:"Sin sede asignada" }}</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
     </div></div>
 </div>
 
-<!-- 2. MODAL AGREGAR USUARIO -->
+{# 2-5. MODALES DE ADMIN — solo si es ADMIN #}
+{% if request.user.perfil_inventario.tipo_usuario == 'ADMIN' %}
+
+{# 2. MODAL AGREGAR USUARIO #}
 <div class="modal fade" id="modalAgregar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title fw-bold">Agregar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">Agregar Usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        {# PENDIENTE: este form debe apuntar a una vista real con action y csrf_token #}
         <div class="modal-body">
             <div class="mb-3"><label class="form-label fw-bold">Nombre:</label><input type="text" class="form-control"></div>
             <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control"></div>
-            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control"></div>
             <div class="mb-3">
                 <label class="form-label fw-bold">Permisos:</label>
                 <select class="form-select">
-                    <option selected>Selecciona un rol</option>
-                    <option value="admin">Administrador</option>
-                    <option value="operador">Operador</option>
-                    <option value="lectura">Solo Lectura</option>
+                    <option value="">Selecciona un rol</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="ALMACEN">Almacenista</option>
+                    <option value="USUARIO">Usuario normal</option>
                 </select>
             </div>
             <div class="mb-3"><label class="form-label fw-bold">Contraseña:</label><input type="password" class="form-control"></div>
             <div class="mb-3"><label class="form-label fw-bold">Confirmar contraseña:</label><input type="password" class="form-control"></div>
         </div>
-        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Agregar usuario</button></div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary rounded-pill fw-bold px-4">
+                Agregar usuario
+            </button>
+        </div>
     </div></div>
 </div>
 
-<!-- 3. MODAL ELIMINAR USUARIO -->
+{# 3. MODAL ELIMINAR USUARIO #}
 <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title fw-bold">Eliminar Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">Eliminar Usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
             <div class="input-group mb-3">
                 <span class="input-group-text fw-bold">Nombre:</span>
                 <input type="text" class="form-control" placeholder="Buscar usuario...">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
             </div>
-            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control" placeholder="(Se autocompletará)"></div>
-            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control" placeholder="(Se autocompletará)"></div>
-            <p class="text-danger small mt-2 fw-bold">* Al hacer clic en eliminar, se borrará permanentemente.</p>
+            <p class="text-danger small fw-bold">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                Esta acción es permanente e irreversible.
+            </p>
         </div>
-        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Eliminar Usuario</button></div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger rounded-pill fw-bold px-4">
+                Eliminar Usuario
+            </button>
+        </div>
     </div></div>
 </div>
 
-<!-- 4. MODAL CAMBIAR CONTRASEÑA -->
+{# 4. MODAL CAMBIAR CONTRASEÑA #}
 <div class="modal fade" id="modalContrasena" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title fw-bold">Cambiar Contraseña</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-            <div class="input-group mb-3">
-                <span class="input-group-text fw-bold">Nombre:</span>
-                <input type="text" class="form-control" value="Alejandro Montoya" readonly>
-            </div>
-            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control" value="administrador" readonly></div>
-            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control" value="producción" readonly></div>
-            <div class="mb-3"><label class="form-label fw-bold">Nueva contraseña:</label><input type="password" class="form-control"></div>
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">Cambiar Contraseña</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Cambiar contraseña</button></div>
+        <div class="modal-body">
+            <div class="mb-3"><label class="form-label fw-bold">Nueva contraseña:</label><input type="password" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-bold">Confirmar contraseña:</label><input type="password" class="form-control"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary rounded-pill fw-bold px-4">
+                Cambiar contraseña
+            </button>
+        </div>
     </div></div>
 </div>
 
-<!-- 5. MODAL CONFIGURACIÓN -->
+{# 5. MODAL CONFIGURACIÓN #}
 <div class="modal fade" id="modalConfig" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title fw-bold">Configuración</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-            <div class="input-group mb-3">
-                <span class="input-group-text fw-bold">Nombre:</span>
-                <input type="text" class="form-control">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-            </div>
-            <div class="mb-3"><label class="form-label fw-bold">Usuario:</label><input type="text" class="form-control"></div>
-            <div class="mb-3"><label class="form-label fw-bold">Dependencia:</label><input type="text" class="form-control"></div>
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">Configuración</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-footer"><button type="button" class="btn" style="background-color: #b1b5d7; font-weight: 600; border-radius: 50px;">Guardar cambios</button></div>
+        <div class="modal-body">
+            <p class="text-muted">Opciones de configuración del sistema.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary rounded-pill fw-bold px-4">
+                Guardar cambios
+            </button>
+        </div>
     </div></div>
 </div>
 
-<!-- 6. MODAL CERRAR SESIÓN -->
+{% endif %} {# fin bloque ADMIN #}
+
+{# 6. MODAL CERRAR SESIÓN — disponible para todos #}
 <div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
         <div class="modal-body text-center p-4">
-            <h4 class="fw-bold mb-4">¿Desea cerrar sesión?</h4>
+            <h4 class="fw-bold mb-2">¿Desea cerrar sesión?</h4>
+            <p class="text-muted mb-4">Se cerrará tu sesión actual.</p>
             <div class="d-flex justify-content-center gap-3">
-                <button type="button" class="btn text-white fw-bold px-4 py-2" style="background-color: #2e3376; border-radius: 50px;">SI</button>
-                <button type="button" class="btn text-white fw-bold px-4 py-2" style="background-color: #2e3376; border-radius: 50px;" data-bs-dismiss="modal">NO</button>
+
+                {# CORREGIDO: logout requiere POST por seguridad en Django #}
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2 rounded-pill">
+                        Sí, cerrar sesión
+                    </button>
+                </form>
+
+                <button type="button"
+                        class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill"
+                        data-bs-dismiss="modal">
+                    No, volver
+                </button>
             </div>
         </div>
     </div></div>
