@@ -1,0 +1,246 @@
+{% extends 'inventario/base_subpage.html' %}
+{% load static %}
+
+
+{% block subpage_content %}
+<div class="container-fluid mt-3">
+
+    <!-- Subpestañas superiores -->
+    <ul class="nav nav-pills nav-justified mb-4" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link {% if pestana_activa == 'nueva' %}active{% endif %}" href="?tab=nueva">Crear nueva asignación</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if pestana_activa == 'activas' %}active{% endif %}" href="?tab=activas">Asignaciones activas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if pestana_activa == 'historial' %}active{% endif %}" href="?tab=historial">Historial</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        
+        <!-- PESTAÑA 1: CREAR NUEVA ASIGNACIÓN -->
+        <div class="tab-pane fade {% if pestana_activa == 'nueva' %}show active{% endif %}" id="tab-nueva">
+            <form action="{% url 'inventario:guardar_asignacion' %}" method="POST" id="form-asignacion">
+                {% csrf_token %}
+                
+                <div class="card mb-3">
+                    <div class="card-body bg-light">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Responsable:</label>
+                                <select name="responsable_recibe" id="select-responsable" class="form-select" required>
+                                    <option value="">-- Seleccionar Trabajador --</option>
+                                    {% for u in usuarios %}
+                                    <option value="{{ u.id }}" 
+                                    data-cedula="{{ u.telefono|default:u.user.username }}" 
+                                    data-cargo="{{ u.rol }}" 
+                                    data-ubicacion="{{ u.sede_por_defecto }}">
+                                     {{ u.descripcion }}
+                                    </option>
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Cédula:</label>
+                                <input type="text" id="info-cedula" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Cargo:</label>
+                                <input type="text" id="info-cargo" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Ubicación:</label>
+                                <input type="text" id="info-ubicacion" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold">Herramientas y Equipos a Entregar</h5>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBusqueda">
+                        + Agregar Ítem por Serial / Descripción
+                    </button>
+                </div>
+
+                <table class="table table-bordered align-middle" id="tabla-asignacion">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ITEM</th>
+                            <th>CATEGORÍA</th>
+                            <th>DESCRIPCIÓN</th>
+                            <th>SERIAL INGEMOL</th>
+                            <th>ESTADO</th>
+                            <th>UBICACIÓN</th>
+                            <th width="100">CANTIDAD</th>
+                            <th>QUITAR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-tabla-asignacion">
+                        <!-- Filas agregadas desde el modal con JS -->
+                    </tbody>
+                </table>
+
+                <div class="text-end mt-4">
+                    <a href="{% url 'inventario:gestion_asignaciones' %}" class="btn btn-secondary me-2">CANCELAR</a>
+                    <button type="submit" class="btn btn-success fw-bold">ACEPTAR Y REGISTRAR</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PESTAÑA 2: ASIGNACIONES ACTIVAS -->
+        <div class="tab-pane fade {% if pestana_activa == 'activas' %}show active{% endif %}" id="tab-activas">
+            <div class="table-responsive">
+                <table class="table table-hover border">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>NO. ASIGNACIÓN</th>
+                            <th>RESPONSABLE</th>
+                            <th>FECHA</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asig in asignaciones_activas %}
+                        <tr>
+                            <td><strong>#{{ asig.id }}</strong></td>
+                            <td>{{ asig.responsable_recibe.descripcion }}</td>
+                            <td>{{ asig.fecha_asignacion|date:"d-m-Y H:i" }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" data-bs-toggle="collapse" data-bs-target="#detalle-{{ asig.id }}">Ver Detalle</button>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="detalle-{{ asig.id }}">
+                            <td colspan="4" class="bg-light">
+                                <table class="table table-sm table-bordered m-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Descripción</th>
+                                            <th>Serial Ingemol</th>
+                                            <th>Cantidad</th>
+                                            <th>Estado Devolución</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for det in asig.detalles.all %}
+                                        <tr>
+                                            <td>{{ det.producto.descripcion }}</td>
+                                            <td>{{ det.elemento_fisico.serial_interno|default:"N/A" }}</td>
+                                            <td>{{ det.cantidad }}</td>
+                                            <td><span class="badge bg-warning text-dark">{{ det.get_estado_devolucion_display }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center">No hay asignaciones activas registradas.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL BÚSQUEDA -->
+<div class="modal fade" id="modalBusqueda" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">BUSCAR POR SERIAL O DESCRIPCIÓN</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+            <input type="text" id="input-modal-busqueda" class="form-control" placeholder="Ej: Motortool, MT-08-09...">
+            <button class="btn btn-primary" type="button" id="btn-ejecutar-busqueda">BUSCAR</button>
+        </div>
+        
+        <table class="table table-hover border">
+            <thead>
+                <tr>
+                    <th>ITEM</th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>SERIAL INGEMOL</th>
+                    <th>ESTADO</th>
+                    <th>UBICACIÓN</th>
+                    <th>ACCIÓN</th>
+                </tr>
+            </thead>
+            <tbody id="resultados-busqueda-modal">
+                <tr><td colspan="6" class="text-center text-muted">Ingrese un término para buscar...</td></tr>
+            </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('select-responsable').addEventListener('change', function() {
+    let opt = this.options[this.selectedIndex];
+    document.getElementById('info-cedula').value = opt.getAttribute('data-cedula') || '';
+    document.getElementById('info-cargo').value = opt.getAttribute('data-cargo') || '';
+    document.getElementById('info-ubicacion').value = opt.getAttribute('data-ubicacion') || '';
+});
+
+document.getElementById('btn-ejecutar-busqueda').addEventListener('click', function() {
+    let q = document.getElementById('input-modal-busqueda').value;
+    fetch(`{% url 'inventario:buscar_elementos_api' %}?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+            let tbody = document.getElementById('resultados-busqueda-modal');
+            tbody.innerHTML = '';
+            if (data.resultados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No se encontraron elementos disponibles.</td></tr>';
+                return;
+            }
+            data.resultados.forEach((item, index) => {
+                let row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${item.descripcion}</td>
+                    <td><strong>${item.serial}</strong></td>
+                    <td>${item.estado}</td>
+                    <td>${item.ubicacion}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success" onclick='agregarItemTabla(${JSON.stringify(item)})'>
+                            ASIGNAR
+                        </button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        });
+});
+
+let contadorItems = 0;
+function agregarItemTabla(item) {
+    contadorItems++;
+    let tbody = document.getElementById('body-tabla-asignacion');
+    let row = `<tr id="item-row-${contadorItems}">
+        <td>${contadorItems}</td>
+        <td>${item.categoria}</td>
+        <td>${item.descripcion}
+            <input type="hidden" name="productos_ids[]" value="${item.id_producto}">
+            <input type="hidden" name="elementos_fisicos_ids[]" value="${item.id_elemento || ''}">
+        </td>
+        <td>${item.serial}</td>
+        <td>${item.estado}</td>
+        <td>${item.ubicacion}</td>
+        <td>
+            <input type="number" name="cantidades[]" value="1" min="1" ${item.es_serializado ? 'readonly' : ''} class="form-control form-control-sm">
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('item-row-${contadorItems}').remove()">X</button>
+        </td>
+    </tr>`;
+    tbody.innerHTML += row;
+}
+</script>
+{% endblock %}

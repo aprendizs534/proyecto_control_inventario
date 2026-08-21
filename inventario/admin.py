@@ -1,8 +1,7 @@
 from django.contrib import admin
 from .models import (
     Sede, Categoria, Marca, EstadoProducto, Ubicacion, RolUsuario, 
-    Usuario, Producto, Movimiento, Prestamo, PrestamoConsumible,
-    InventarioSede,
+    Usuario, Producto, Movimiento, InventarioSede, ElementoFisico, Asignacion, AsignacionDetalle,
 )
 
 @admin.register(Sede)
@@ -26,5 +25,6 @@ admin.site.register(RolUsuario)
 admin.site.register(Usuario)
 admin.site.register(Producto)
 admin.site.register(Movimiento)
-admin.site.register(Prestamo)
-admin.site.register(PrestamoConsumible)
+admin.site.register(ElementoFisico)
+admin.site.register(Asignacion)
+admin.site.register(AsignacionDetalle)

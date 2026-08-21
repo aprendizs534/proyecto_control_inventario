@@ -91,7 +91,7 @@
 
     {# ── BOTÓN ASIGNACIONES ── #}
     <div class="d-flex justify-content-center mb-4">
-        <a href="{% url 'inventario:asignaciones' %}" class="btn-asignaciones">ASIGNACIONES</a>
+        <a href="{% url 'inventario:gestion_asignaciones' %}" class="btn-asignaciones">ASIGNACIONES</a>
     </div>
 
     {# ── MENÚ LATERAL ── #}
@@ -102,7 +102,7 @@
         </div>
         <div class="offcanvas-body p-0">
             <div class="list-group list-group-flush">
-                <a href="{% url 'inventario:asignaciones' %}"      class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
+                <a href="{% url 'inventario:gestion_asignaciones' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Asignaciones</a>
                 <a href="{% url 'inventario:registrar_entrada' %}" class="list-group-item list-group-item-action py-3 fw-bold text-center">Entradas</a>
                 <a href="{% url 'inventario:menu_salidas' %}"      class="list-group-item list-group-item-action py-3 fw-bold text-center">Salidas</a>
                 <a href="{% url 'inventario:ubicaciones' %}"       class="list-group-item list-group-item-action py-3 fw-bold text-center">Ubicaciones</a>

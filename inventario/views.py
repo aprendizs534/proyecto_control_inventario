@@ -2,11 +2,148 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
+from django.http import JsonResponse
 
 from .models import (
-    Producto, Sede, InventarioSede, Movimiento,
-    EstadoProducto, Ubicacion, TipoMovimiento, Usuario,
+    Asignacion, AsignacionDetalle, ElementoFisico, Producto,
+    InventarioSede, Usuario, EstatusElemento, EstadoAsignacion, EstadoDetalleAsignacion, Sede, Movimiento, TipoMovimiento,
 )
+
+#-----------------------------------------------------------------------------------------
+
+def gestion_asignaciones(request):
+    """Vista principal con las tres pestañas: Crear, Activas e Historial."""
+    pestana_activa = request.GET.get('tab', 'activas')
+
+    
+    # 1. Asignaciones Activas
+    asignaciones_activas = Asignacion.objects.filter(
+        estado=EstadoAsignacion.ACTIVA
+    ).select_related('responsable_recibe').prefetch_related('detalles__producto', 'detalles__elemento_fisico')
+
+    # 2. Historial de Cierres / Devoluciones
+    historial_asignaciones = Asignacion.objects.filter(
+        estado=EstadoAsignacion.CERRADA
+    ).select_related('responsable_recibe').order_by('-fecha_asignacion')
+
+    # Listado de trabajadores para la cabecera
+    usuarios = Usuario.objects.all()
+
+    context = {
+        'titulo': 'ASIGNACIONES',
+        'pestana_activa': pestana_activa,
+        'asignaciones_activas': asignaciones_activas,
+        'historial_asignaciones': historial_asignaciones,
+        'usuarios': usuarios,
+    }
+    return render(request, 'inventario/asignaciones.html', context)
+
+def buscar_elementos_api(request):
+    """Endpoint AJAX para la ventana modal 'BUSCAR POR SERIAL O DESCRIPCIÓN'."""
+    query = request.GET.get('q', '').strip()
+    resultados = []
+
+    if query:
+        # Activos Serializados Disponibles
+        elementos_fisicos = ElementoFisico.objects.filter(
+            estatus=EstatusElemento.DISPONIBLE
+        ).filter(
+            Q(serial_interno__icontains=query) | Q(producto__descripcion__icontains=query)
+        ).select_related('producto', 'estado_fisico', 'ubicacion')[:10]
+
+        for elem in elementos_fisicos:
+            resultados.append({
+                'tipo': 'SERIALIZADO',
+                'id_elemento': elem.id,
+                'id_producto': elem.producto.id,
+                'descripcion': elem.producto.descripcion,
+                'categoria': elem.producto.categoria.nombre if elem.producto.categoria else 'N/A',
+                'serial': elem.serial_interno,
+                'estado': elem.estado_fisico.nombre if elem.estado_fisico else 'N/A',
+                'ubicacion': elem.ubicacion.nombre if elem.ubicacion else 'N/A',
+                'es_serializado': True
+            })
+
+        # Consumibles / Herramientas Manuales en Stock
+        productos_stock = InventarioSede.objects.filter(
+            cantidad_disponible__gt=0,
+            producto__es_serializado=False
+        ).filter(
+            Q(producto__descripcion__icontains=query) | Q(producto__codigo__icontains=query)
+        ).select_related('producto', 'sede')[:10]
+
+        for inv in productos_stock:
+            resultados.append({
+                'tipo': 'STOCK',
+                'id_elemento': None,
+                'id_producto': inv.producto.id,
+                'descripcion': inv.producto.descripcion,
+                'categoria': inv.producto.categoria.nombre if inv.producto.categoria else 'N/A',
+                'serial': 'N/A (Sin Serial)',
+                'estado': 'Bueno',
+                'ubicacion': inv.sede.nombre if inv.sede else 'N/A',
+                'stock_disponible': inv.cantidad_disponible,
+                'es_serializado': False
+            })
+
+    return JsonResponse({'resultados': resultados})
+
+@transaction.atomic
+def guardar_asignacion(request):
+    """Procesa el guardado del acta de asignación completa."""
+    if request.method == 'POST':
+        usuario_recibe_id = request.POST.get('responsable_recibe')
+        usuario_entrega = getattr(request.user, 'usuario_profile', None)
+        
+        elementos_fisicos_ids = request.POST.getlist('elementos_fisicos_ids[]')
+        productos_ids = request.POST.getlist('productos_ids[]')
+        cantidades = request.POST.getlist('cantidades[]')
+
+        if not usuario_recibe_id or not productos_ids:
+            messages.error(request, "Debe seleccionar un responsable y al menos un ítem para asignar.")
+            return redirect('inventario:gestion_asignaciones')
+
+        usuario_recibe = get_object_or_404(Usuario, id=usuario_recibe_id)
+
+        # Crear Cabecera
+        asignacion = Asignacion.objects.create(
+            responsable_recibe=usuario_recibe,
+            responsable_entrega=usuario_entrega,
+            sede=getattr(usuario_recibe, 'sede', Sede.objects.first()),
+            estado=EstadoAsignacion.ACTIVA
+        )
+
+        # Crear Detalle y Actualizar Inventario
+        for i in range(len(productos_ids)):
+            prod_id = productos_ids[i]
+            elem_id = elementos_fisicos_ids[i] if i < len(elementos_fisicos_ids) and elementos_fisicos_ids[i] != '' else None
+            cantidad = int(cantidades[i]) if i < len(cantidades) else 1
+
+            producto = get_object_or_404(Producto, id=prod_id)
+            elemento_fisico = get_object_or_404(ElementoFisico, id=elem_id) if elem_id else None
+
+            AsignacionDetalle.objects.create(
+                asignacion=asignacion,
+                producto=producto,
+                elemento_fisico=elemento_fisico,
+                cantidad=cantidad,
+                estado_devolucion=EstadoDetalleAsignacion.PENDIENTE
+            )
+
+            # Actualizar estado según tipo de producto
+            if elemento_fisico:
+                elemento_fisico.estatus = EstatusElemento.ASIGNADO
+                elemento_fisico.save()
+            else:
+                inv_sede = InventarioSede.objects.get(producto=producto, sede=asignacion.sede)
+                inv_sede.cantidad_disponible -= cantidad
+                inv_sede.save()
+
+        messages.success(request, f"Asignación #{asignacion.id} registrada a {usuario_recibe.descripcion}.")
+        return redirect('inventario:gestion_asignaciones')
+
+#------------------------------------------------------------------------------------------
 
 
 # Dashboard 
@@ -90,9 +227,9 @@ def registrar_entrada(request):
 
 #  Vistas stub del Dashboard 
 
-@login_required
-def asignaciones(request):
-    return render(request, 'inventario/base_subpage.html', {'titulo': 'Asignaciones'})
+#@login_required
+#def asignaciones(request):
+#    return render(request, 'inventario/base_subpage.html', {'titulo': 'Asignaciones'})
 
 @login_required
 def herramientas(request):
@@ -152,3 +289,4 @@ def estado_productos(request):
 @login_required
 def categorias(request):
     return render(request, 'inventario/base_subpage.html', {'titulo': 'Categorías'})
+

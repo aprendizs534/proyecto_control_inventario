@@ -8,7 +8,6 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
 
     # Botones del Dashboard
-    path('asignaciones/', views.asignaciones, name='asignaciones'),
     path('herramientas/', views.herramientas, name='herramientas'),
     path('maquinas/', views.maquinas, name='maquinas'),
     path('equipos/', views.equipos, name='equipos'),
@@ -27,4 +26,9 @@ urlpatterns = [
     path('menu/categorias/', views.categorias, name='categorias'),
 
     path('entradas/registrar/', views.registrar_entrada, name='registrar_entrada'),
+
+    # Asignaciones
+    path('asignaciones/', views.gestion_asignaciones, name='gestion_asignaciones'),
+    path('asignaciones/api/buscar/', views.buscar_elementos_api, name='buscar_elementos_api'),
+    path('asignaciones/guardar/', views.guardar_asignacion, name='guardar_asignacion'),
 ]
