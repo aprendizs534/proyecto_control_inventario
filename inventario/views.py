@@ -40,51 +40,69 @@ def gestion_asignaciones(request):
     return render(request, 'inventario/asignaciones.html', context)
 
 def buscar_elementos_api(request):
-    """Endpoint AJAX para la ventana modal 'BUSCAR POR SERIAL O DESCRIPCIÓN'."""
-    query = request.GET.get('q', '').strip()
+    q = request.GET.get('q', '').strip()
     resultados = []
 
-    if query:
-        # Activos Serializados Disponibles
-        elementos_fisicos = ElementoFisico.objects.filter(
-            estatus=EstatusElemento.DISPONIBLE
+    if q:
+        # 1. Elementos Físicos (Serializados)
+        elementos = ElementoFisico.objects.filter(
+            Q(serial_interno__icontains=q) | 
+            Q(producto__descripcion__icontains=q) | 
+            Q(producto__codigo__icontains=q)
         ).filter(
-            Q(serial_interno__icontains=query) | Q(producto__descripcion__icontains=query)
-        ).select_related('producto', 'estado_fisico', 'ubicacion')[:10]
+            Q(estatus__icontains='Dispon')
+        )[:15]
 
-        for elem in elementos_fisicos:
+        for elem in elementos:
+            p = elem.producto
+            sede = str(elem.sede_actual) if elem.sede_actual else ''
+            ubi = str(elem.ubicacion) if elem.ubicacion else ''
+            ubicacion_str = f"{sede} - {ubi}" if (sede and ubi) else (sede or ubi or 'N/A')
+            estatus_fmt = str(elem.estatus).capitalize() if elem.estatus else 'Disponible'
+
+            # Obtener Categoría y Marca con fallback a N/A
+            cat_nombre = str(p.categoria) if getattr(p, 'categoria', None) else 'N/A'
+            marca_nombre = str(p.marca) if getattr(p, 'marca', None) else 'N/A'
+
             resultados.append({
+                'id': elem.id,
                 'tipo': 'SERIALIZADO',
-                'id_elemento': elem.id,
-                'id_producto': elem.producto.id,
-                'descripcion': elem.producto.descripcion,
-                'categoria': elem.producto.categoria.nombre if elem.producto.categoria else 'N/A',
+                'categoria': cat_nombre,
+                'descripcion': p.descripcion,
+                'marca': marca_nombre,
                 'serial': elem.serial_interno,
-                'estado': elem.estado_fisico.nombre if elem.estado_fisico else 'N/A',
-                'ubicacion': elem.ubicacion.nombre if elem.ubicacion else 'N/A',
-                'es_serializado': True
+                'estatus': estatus_fmt,
+                'estado': estatus_fmt,
+                'ubicacion': ubicacion_str,
+                'max_cantidad': 1
             })
 
-        # Consumibles / Herramientas Manuales en Stock
-        productos_stock = InventarioSede.objects.filter(
-            cantidad_disponible__gt=0,
-            producto__es_serializado=False
-        ).filter(
-            Q(producto__descripcion__icontains=query) | Q(producto__codigo__icontains=query)
-        ).select_related('producto', 'sede')[:10]
+        # 2. Inventario por Sede (No Serializados / Lotes)
+        inventario_lotes = InventarioSede.objects.filter(
+            Q(producto__descripcion__icontains=q) | Q(producto__codigo__icontains=q),
+            cantidad_disponible__gt=0
+        )[:15]
 
-        for inv in productos_stock:
+        for inv in inventario_lotes:
+            p = inv.producto
+            sede_lote = str(inv.sede) if getattr(inv, 'sede', None) else ''
+            ubi_lote = str(inv.ubicacion) if hasattr(inv, 'ubicacion') and inv.ubicacion else ''
+            ubicacion_lote_str = f"{sede_lote} - {ubi_lote}" if (sede_lote and ubi_lote) else (sede_lote or ubi_lote or 'N/A')
+
+            cat_nombre = str(p.categoria) if getattr(p, 'categoria', None) else 'N/A'
+            marca_nombre = str(p.marca) if getattr(p, 'marca', None) else 'N/A'
+
             resultados.append({
-                'tipo': 'STOCK',
-                'id_elemento': None,
-                'id_producto': inv.producto.id,
-                'descripcion': inv.producto.descripcion,
-                'categoria': inv.producto.categoria.nombre if inv.producto.categoria else 'N/A',
-                'serial': 'N/A (Sin Serial)',
-                'estado': 'Bueno',
-                'ubicacion': inv.sede.nombre if inv.sede else 'N/A',
-                'stock_disponible': inv.cantidad_disponible,
-                'es_serializado': False
+                'id': inv.id,
+                'tipo': 'LOTE',
+                'categoria': cat_nombre,
+                'descripcion': p.descripcion,
+                'marca': marca_nombre,
+                'serial': 'N/A (Lote)',
+                'estatus': 'Disponible',
+                'estado': 'Disponible',
+                'ubicacion': ubicacion_lote_str,
+                'max_cantidad': inv.cantidad_disponible
             })
 
     return JsonResponse({'resultados': resultados})

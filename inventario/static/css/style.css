@@ -195,7 +195,7 @@
 .nav-pills .nav-link.active {
     background-color:var(--color-primario); /* Color primario del proyecto */
     color: #ffffff;
-    border-color: #0d6efd;
+    border-color: #0a2349;
     box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
 }
 
@@ -216,7 +216,7 @@
 
 /* Modal de Búsqueda */
 #modalBusqueda .modal-header {
-    border-bottom: 2px solid #0d6efd;
+    border-bottom: 2px solid #0a2144;
 }
 
 #modalBusqueda .table td {
@@ -226,5 +226,5 @@
 
 /* Indicadores y Tarjeta de datos del operario */
 .card-operario-header {
-    border-left: 4px solid #0d6efd;
+    border-left: 4px solid #091b36;
 }
